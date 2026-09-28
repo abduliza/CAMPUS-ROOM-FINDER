@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RoomPulse · Campus room finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#00484e;--coral:#e8806a;--bg:#f1f6f2;--card:#fdfbfa;--mut:#5f7377;--line:#b7cdc3;--free:#0a6b45;--freebg:#cfe8dc;--busybg:#fcdcd3;--busyink:#d4644c;--soon:#b7791f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Outfit,system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{display:grid;grid-template-columns:330px 1fr;gap:26px;max-width:1280px;margin:0 auto;padding:24px}
+aside{position:sticky;top:24px;align-self:start;background:var(--card);border-radius:16px;padding:24px;box-shadow:0 8px 28px rgba(0,72,78,.07)}
+.brand{display:flex;gap:14px;align-items:center}.logo{width:52px;height:52px;border-radius:12px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.5rem}
+.brand b{font-size:1.4rem;display:block;line-height:1.1}.brand small,.eyebrow,aside h4{font-size:.75rem;letter-spacing:.09em;color:var(--mut);font-weight:600}
+.live{background:#e6eeea;border-radius:12px;padding:16px;margin:20px 0}.live .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--coral);margin-right:6px}
+.live .l{font-size:.75rem;letter-spacing:.09em;color:var(--mut);font-weight:600}.live .t{font-size:2.3rem;font-weight:700;line-height:1.2}.live .t small{font-size:1rem;font-weight:500;color:var(--mut)}
+.live .p{display:block;font-weight:600;margin-top:4px}.live small{color:var(--mut)}
+aside h4{margin:22px 0 10px}
+#pills{display:flex;flex-wrap:wrap;gap:8px}
+.fp{min-width:44px;height:40px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--ink);padding:0 14px;font-weight:600}
+.fp.on{background:var(--coral);border-color:var(--coral);color:#fff}
+aside label{display:block;font-size:.9rem;color:var(--mut);margin:12px 0 4px}
+aside select,aside input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+.note{font-size:.85rem;color:var(--mut);border-top:1px solid var(--line);padding-top:14px;margin:18px 0 0}
+button{font:inherit;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--coral);color:#fff;border:0;border-radius:9px;padding:8px 16px;font-weight:600}
+.btn.wide{width:100%;justify-content:center;padding:13px;margin-top:14px;font-size:1rem}
+.ghost{width:100%;margin-top:14px;padding:11px;border:1px solid var(--line);background:transparent;border-radius:10px;color:var(--ink);font-weight:600}
+:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+h1{font-size:3.3rem;line-height:1.02;margin:6px 0 20px;letter-spacing:-.02em}h1 em{font-style:normal;color:var(--coral)}
+.seg{display:flex;border:1px solid var(--line);border-radius:99px;padding:4px;background:var(--card)}
+.seg button{background:transparent;color:var(--ink);border:0;border-radius:99px;padding:10px 22px;font-weight:600}.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.ask{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:14px;padding:12px 14px;box-shadow:0 8px 28px rgba(0,72,78,.07)}
+.ask svg{color:var(--coral);flex:none}.ask input{flex:1;border:0;background:transparent;font:inherit;color:var(--ink);min-width:0}.ask input:focus-visible{outline:0}
+.ask .btn{padding:12px 24px}
+details{margin:10px 2px;font-size:.85rem;color:var(--mut)}details input{margin-top:6px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.chips span{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:2px 12px;margin:2px 6px 0 0;font-size:.85rem}
+.head{display:flex;justify-content:space-between;align-items:end;margin-top:22px}h2{font-size:1.9rem;margin:0}.mut{color:var(--mut);margin:2px 0}
+.fh{display:flex;align-items:center;gap:12px;font-size:1.1rem;margin:26px 0 12px}.fh span{font-size:.85rem;color:var(--mut);font-weight:400}.fh i{flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.room,.card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(0,72,78,.06)}
+.rh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.room b{font-size:1.4rem}.room small{color:var(--mut);display:block}.room p{color:var(--mut);margin:14px 0 10px;font-size:.92rem}
+.pill{padding:3px 14px;border-radius:99px;font-size:.8rem;font-weight:600;background:var(--freebg);color:var(--free)}.pill.b{background:var(--busybg);color:var(--busyink)}
+.rf{display:flex;justify-content:space-between;align-items:center;margin-top:16px;min-height:38px}.clk{display:inline-flex;gap:6px;align-items:center;font-weight:600;font-size:.88rem}
+.card h3{margin:0}.card .sub{color:var(--mut);font-size:.9rem}.legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:.85rem;color:var(--mut);margin-top:12px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.legend label{margin-left:auto}
+#stage{perspective:2200px;height:600px;overflow:hidden;background:linear-gradient(#e2efe7,#c8e1d2);border:1px solid #d3e5da;border-radius:12px;display:flex;justify-content:center;align-items:center;margin-top:14px}
+#stage{position:relative;cursor:grab;touch-action:none}
+#scene{position:relative;width:0;height:0;transform-style:preserve-3d;transform:translate(var(--px,0px),var(--py,0px)) scale(var(--z,1))}
+.b{position:absolute;left:-260px;top:-35px;width:520px;height:70px;transform-style:preserve-3d;transform:translate(var(--tx,0px),190px) rotateX(55deg) rotateZ(var(--rz,-25deg))}
+.zoom{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.zoom button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:1.2rem;font-weight:700;padding:0}
+.fl{position:absolute;inset:0;transform-style:preserve-3d;transform:translateZ(calc(var(--i)*100px));background:rgba(255,255,255,.6);border:1px solid #fff}
+.fl .lb{position:absolute;right:calc(100% + 10px);top:0;font-size:.75rem;font-weight:700}
+.tg{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:1fr;gap:4px;height:100%;padding:4px}
+.t{padding:0;border-radius:5px;font-size:.85rem;font-weight:700;color:#fff;border:0;background:var(--coral)}.t.free{background:var(--free)}.t.soon{background:var(--soon)}.t.dim{opacity:.25}.t.sel{outline:3px solid var(--ink)}
+.dn{font-size:1.8rem;margin:0}.fbox{background:var(--ink);color:#fff;border-radius:12px;padding:22px;margin-top:14px}.fbox small{color:#a9cfcf;letter-spacing:.06em;font-weight:600;display:block}
+.big{font-size:3rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.hide{display:none}
+@media(max-width:860px){.app{grid-template-columns:1fr}aside{position:static}h1{font-size:2.4rem}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand"><div class="logo">R</div><div><b>RoomPulse</b><small>CAMPUS FINDER</small></div></div>
+  <div class="live"><div class="l"><span class="dot"></span>LIVE NOW</div><div class="t" id="lt"></div><span class="p" id="pn"></span><small id="ld"></small></div>
+  <h4>FLOORS</h4><div id="pills"></div><select id="floor" class="hide" aria-hidden="true"></select>
+  <h4>FILTERS</h4>
+  <label for="day">Day</label><select id="day"></select>
+  <label for="time">Time</label><input type="time" id="time">
+  <label for="dur">Free for at least</label><input type="number" id="dur" min="0" step="15" value="0">
+  <small class="mut">Minutes · 0 means free right now</small>
+  <button class="ghost" id="now">Use live time</button>
+  <p class="note">Based on 10 class timetables · 2026–27 period times. A free room is not a reservation.</p>
+</aside>
+<main>
+  <div class="top"><div><span class="eyebrow">EXPLORE THE CAMPUS</span><h1>Find a room,<br><em>right now.</em></h1></div>
+   <div class="seg" role="group" aria-label="View"><button id="tl" aria-pressed="true">List</button><button id="tm" aria-pressed="false">3D map</button></div></div>
+  <div class="ask"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>
+   <input id="q" aria-label="Describe the room you need" placeholder="Free room on the 4th floor for 90 minutes at 3pm"><button class="btn" id="go">Search →</button></div>
+  <details><summary>Use Claude for smarter search (optional)</summary><input id="key" type="password" placeholder="Anthropic API key"></details>
+  <div class="chips" id="interp"></div>
+  <div id="listv"><div class="head"><div><h2 id="ttl">All rooms</h2><p class="mut" id="cnt"></p></div><span class="mut" id="tot"></span></div><div id="list"></div></div>
+  <div id="mapv" class="hide">
+   <div class="card"><div class="head" style="margin:0"><h3>3D campus map</h3><span class="sub">IST block (left) · TB block (right)</span></div>
+    <div id="stage"><div class="zoom"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zfit" aria-label="Reset view" style="font-size:.7rem">Fit</button></div><div id="scene"><div class="b" id="bld" style="--tx:-100px"></div><div class="b" id="tb" style="--tx:330px;left:-70px;width:140px"></div></div></div>
+    <div class="legend"><span><i style="background:var(--free)"></i>Free</span><span><i style="background:var(--soon)"></i>Class starts within 30 min</span><span><i style="background:var(--coral)"></i>In use</span><label>Rotate <input type="range" id="rot" min="-80" max="80" value="-25"></label></div></div>
+   <div class="card" id="det" style="margin-top:16px"><span class="mut">Tap a room on the map to see its countdown.</span></div>
+   <p class="mut" style="font-size:.85rem">Scroll or use + / − to zoom, and drag the map to move it. TB is a separate block, drawn beside the IST block.</p>
+  </div>
+</main>
+</div>
+<script>
+const D=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],DK={M:1,T:2,W:3,Th:4,F:5};
+const TTS=[[[540,590],[590,640],[650,700],[700,750],[750,800],[800,850],[850,900],[910,960],[960,1010]],
+           [[540,590],[595,645],[650,700],[705,755],[755,810],[810,860],[865,915],[920,970],[975,1025]]];
+// Header: Section|timing(0=2026-27 sheets, 1=2024-25 first-year sheets)|home venue. Tokens: period(-period)v = in home venue, @room/room = elsewhere.
+const RAW=`
+IV ECE-A|0|225
+M 1v 3-4v
+T 1-4v
+W 1v 2@108 3-4v
+Th 1-4v
+F 1-4v
+III ECE-DS|0|519
+M 1-4v
+T 1-4v 6-7@108/107
+W 1-4v 8-9@625
+Th 1-4v
+F 1-4v 6@625 8-9@108/107
+III ECE-B|0|518
+M 1-2@108/309 6-9v
+T 1-2@625 6-9v
+W 1@625 6-9v
+Th 1-2@108/309 6-9v
+F 6-9v
+III ECE-A|0|518
+M 1-4v 6-7@625
+T 1-4v 7@625
+W 1-4v 8-9@108/309
+Th 1-4v
+F 1-4v 6-7@108/309
+III BME|0|211
+M 1-2@625 3-4@107 6-9v
+T 1-2@108 3@625 6-9v
+W 6-9v
+Th 4@108 6-9v
+F 1@108 6-9v
+II ECE-DS B|0|411
+M 3-4@309/107 6-9v
+T 1-2@309/107 6-9v
+W 1@401 6-9v
+Th 1-2@401 3-4@TB106 6-9v
+F 1@TB106 6-9v
+II ECE-DS A|0|416
+M 1-4v 6-7@602 8-9@309/107
+T 1-4v 6@602 8-9@TB106
+W 1-4v 7@TB106
+Th 1-4v 6-7@309/107
+F 1-4v
+II BME|0|602
+M 1-4v 6-7@107/309
+T 1-4v 6-7@TB106
+W 1-3v 6@TB106 7@602
+Th 1-4v 8-9@107/309
+F 1-4v 8-9@602
+I ECE-A|1|602
+M 1-4@602 8-9@710
+T 1-4@602
+W 1-3@602 6-7@618 8-9@108
+Th 1-4@602 6-7@510 8-9@201
+F 1-4@602 6@602 7-9@626
+I ECE-B & EEE|1|602
+M 1@609 2@710/520 6-9@602
+T 6-9@602
+W 1@710/520 2@617 3-4@510 5@618 7-9@602
+Th 1-2@201 3@626 4@710 6-9@602
+F 1-2@617 4-6@626 8-9@602
+I ECE-DS|1|502
+M 1@710 3-4@617 6-9@502
+T 3-4@201 6-9@502
+W 1-2@510 3@710 5-6@617 7-9@502
+Th 1@710 2@510 3@710 4-9@502
+F 1-3@626
+I Biotech-B|1|702
+M 1@520 4@710/520 6-9@702
+T 1-2@710 3@520 4@710 7-9@702
+W 6-9@702
+Th 3@710 4@510/520 6-9@702
+F 1-6@702`;
+const sched={};
+const add=(r,d,s,e,n,p)=>((sched[r]??={})[d]??=[]).push({s,e,sec:n,p});
+let cur;
+RAW.trim().split("\n").forEach(l=>{l=l.trim();
+  if(l.includes("|")){const [n,t,v]=l.split("|");cur={n,t:+t,v};return}
+  const [d,...tk]=l.split(" ");
+  tk.forEach(k=>{const m=k.match(/^(\d)(?:-(\d))?(?:v|@(.+))$/),a=+m[1],b=+(m[2]||m[1]),T=TTS[cur.t];
+    (m[3]?m[3].split("/"):[cur.v]).forEach(r=>add(r,D[DK[d]],T[a-1][0],T[b-1][1],cur.n,a===b?"Period "+a:"Periods "+a+"–"+b))})});
+Object.values(sched).forEach(o=>Object.values(o).forEach(a=>a.sort((x,y)=>x.s-y.s)));
+const rooms={};
+Object.keys(sched).forEach(r=>{rooms[r]={floor:/^\d/.test(r)?+r[0]:8}});
+
+const $=id=>document.getElementById(id);
+const FN=f=>f===8?"TB block":f===0?"Ground floor":f+(f===1?"st":f===2?"nd":f===3?"rd":"th")+" floor";
+const lab=r=>/^TB/.test(r)?"TB "+r.slice(2):"IST "+r;
+const hm=x=>String(Math.floor(x/60)).padStart(2,"0")+":"+String(Math.floor(x%60)).padStart(2,"0");
+const h12=x=>{let h=Math.floor(x/60),m=Math.floor(x%60);const p=h>=12?"PM":"AM";h=h%12||12;return h+":"+String(m).padStart(2,"0")+" "+p};
+const cd=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return (h?h+"h ":"")+String(m).padStart(2,"0")+"m "+String(s%60).padStart(2,"0")+"s"};
+
+let sim=null,sel=null;
+function vnow(){const d=new Date();if(!sim)return{day:D[d.getDay()],sec:d.getHours()*3600+d.getMinutes()*60+d.getSeconds()};
+  return{day:sim.day,sec:sim.sec+(Date.now()-sim.at)/1000}}
+function st(r,day,t,dur){
+  const c=(sched[r]||{})[day]||[],now=c.find(x=>x.s<=t&&t<x.e),nx=c.find(x=>x.s>t);
+  if(now)return{free:false,until:now.e,kind:"busy",text:`In use · ${now.p} · ${now.sec} until ${h12(now.e)}`};
+  if(nx&&nx.s<t+Math.max(dur,1))return{free:false,until:nx.s,kind:"free",text:`Free now, but ${nx.p} · ${nx.sec} starts ${h12(nx.s)}`};
+  return{free:true,until:nx?nx.s:null,kind:"free",text:nx?`Free until ${h12(nx.s)} · ${nx.p} · ${nx.sec}`:"No more classes today"};
+}
+const eff=st;
+function view(){return{day:$("day").value,t:($("time").value?+$("time").value.slice(0,2)*60+ +$("time").value.slice(3):540),dur:+$("dur").value||0}}
+function matches(r){const f=$("floor").value;return f===""||rooms[r].floor==f}
+const sortR=Object.keys(rooms).sort();
+
+const IC={clock:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+ chat:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>'};
+function pills(){const fl=[...new Set(Object.values(rooms).map(x=>x.floor))].sort((a,b)=>a-b),cur=$("floor").value;
+  $("pills").innerHTML=[["","All"],...fl.map(f=>[String(f),f===8?"TB":f])].map(([v,l])=>`<button class="fp ${cur===v?"on":""}" data-f="${v}" aria-pressed="${cur===v}">${l}</button>`).join("")}
+function render(){
+  const {day,t,dur}=view(),by={};
+  sortR.filter(matches).forEach(r=>(by[rooms[r].floor]??=[]).push(r));
+  const fl=Object.keys(by).sort((a,b)=>a-b);
+  pills();
+  const vis=sortR.filter(matches),nfree=vis.filter(r=>eff(r,day,t,dur).free).length;
+  $("ttl").textContent=$("floor").value===""?"All rooms":FN(+$("floor").value);
+  $("cnt").textContent=`${nfree} free of ${vis.length} rooms ${sim?"at this time":"right now"}`;
+  $("tot").textContent=Object.keys(rooms).length+" rooms · 10 timetables";
+  $("list").innerHTML=fl.length?fl.map(f=>{
+    const ss=by[f].map(r=>[r,eff(r,day,t,dur)]),nf=ss.filter(x=>x[1].free).length;
+    return `<h3 class="fh">${FN(+f)} <span>${nf} of ${ss.length} free</span><i></i></h3><div class="cards">${ss.map(([r,s])=>
+     `<div class="room"><div class="rh"><b>${lab(r)}</b><span class="pill ${s.free?"f":"b"}">${s.free?"Free":"Busy"}</span></div><small>${FN(rooms[r].floor)}</small><p>${s.text}</p>
+      <div class="rf"><span class="clk">${IC.clock} ${s.until!=null?"Until "+h12(s.until):"Rest of day"}</span>${s.free?`<button class="btn" data-r="${r}" data-v="sq">${IC.chat} Share</button>`:""}</div></div>`).join("")}</div>`}).join(""):'<p class="mut">No rooms match these filters.</p>';
+  const tile=r=>{const s=eff(r,day,t,dur),soon=s.free&&s.until!=null&&s.until-t<30;
+    return `<button class="t ${s.free?(soon?"soon":"free"):""} ${matches(r)?"":"dim"} ${sel===r?"sel":""}" data-m="${r}" aria-label="${lab(r)}: ${s.text}">${/^TB/.test(r)?"106":r}</button>`};
+  let h="";
+  const fls=[...new Set(sortR.filter(r=>rooms[r].floor<8).map(r=>rooms[r].floor))].sort((a,b)=>a-b);
+  fls.forEach((f,i)=>{h+=`<div class="fl" style="--i:${i}"><span class="lb">${f}F</span><div class="tg">${sortR.filter(r=>rooms[r].floor===f).map(tile).join("")}</div></div>`});
+  const tbr=sortR.filter(r=>rooms[r].floor===8);
+  $("tb").innerHTML=`<div class="fl" style="--i:0"><span class="lb">TB block</span><div class="tg" style="grid-template-columns:repeat(${tbr.length||1},1fr)">${tbr.map(tile).join("")}</div></div>`;
+  $("bld").innerHTML=h;detail();
+}
+function squad(r){
+  const {day,t}=view(),s=eff(r,day,t,0),u=s.until;
+  const msg=`📍 Heading to ${lab(r)}. It's free ${u!=null?"until "+h12(u):"for the rest of the day"}. Come fast!`;
+  window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
+}
+function detail(){
+  if(!sel)return;
+  const v=vnow(),b=st(sel,v.day,v.sec/60,0),free=b.free;
+  $("det").innerHTML=`<div class="rh"><div><span class="eyebrow">SELECTED ROOM</span><h3 class="dn">${lab(sel)}</h3></div><span class="pill ${free?"f":"b"}">${free?"FREE":"BUSY"}</span></div>
+   <p class="mut">${FN(rooms[sel].floor)} · ${b.text}</p>
+   <div class="fbox"><small>${free?"FREE FOR":"IN USE FOR"}</small><div class="big" id="cdv">${b.until!=null?cd(b.until*60-v.sec):"All day"}</div>
+   <small>${b.until==null?"No more classes today":free?"Until the next class starts here":"Until this class ends"}</small></div>
+   ${free?`<button class="btn wide" data-r="${sel}" data-v="sq">${IC.chat} Call the squad on WhatsApp</button>`:""}`;
+}
+function periodNow(sec){const t=sec/60,T=TTS[0],i=T.findIndex(x=>x[0]<=t&&t<x[1]);
+  if(i>=0)return i===4?"Period 5 (lunch)":"Period "+(i+1);
+  return t<T[0][0]?"Before classes":t>=T[8][1]?"Classes over":"Break"}
+const FULL={Sun:"Sunday",Mon:"Monday",Tue:"Tuesday",Wed:"Wednesday",Thu:"Thursday",Fri:"Friday",Sat:"Saturday"};
+function tick(){const v=vnow();
+  $("lt").innerHTML=hm(v.sec/60)+" <small>IST</small>";
+  $("ld").textContent=FULL[v.day]+(sim?"":", "+new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}))+" · "+(sim?"Simulated time":"Live schedule");
+  $("pn").textContent=periodNow(v.sec);
+  if(sel){const b=st(sel,v.day,v.sec/60,0),e=$("cdv");if(e&&b.until!=null)e.textContent=cd(b.until*60-v.sec)}}
+function setLive(){sim=null;const v=vnow();$("day").value=v.day;$("time").value=hm(v.sec/60);render()}
+function onPick(){sim={day:$("day").value,sec:($("time").value?+$("time").value.slice(0,2)*60+ +$("time").value.slice(3):540)*60,at:Date.now()};render()}
+
+function localParse(q){const s=q.toLowerCase(),o={};
+  if(/ground/.test(s))o.floor=0;else{const f=s.match(/(\d)(?:st|nd|rd|th)?\s*floor/)||s.match(/(first|second|third|fourth|fifth|sixth|seventh)\s*floor/);
+    if(f)o.floor=isNaN(f[1])?["","first","second","third","fourth","fifth","sixth","seventh"].indexOf(f[1]):+f[1]}
+  if(/non[\s-]?ac|without ac|no ac/.test(s))o.ac=false;else if(/\bac\b|air[\s-]?condition/.test(s))o.ac=true;
+  const h=s.match(/(\d+(?:\.\d+)?)\s*(?:hours?|hrs?|h)\b/),mn=s.match(/(\d+)\s*(?:minutes?|mins?)\b/);
+  if(h)o.duration=Math.round(+h[1]*60);else if(mn)o.duration=+mn[1];else if(/an hour/.test(s))o.duration=60;
+  const at=s.match(/\bat\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/);
+  if(at){let hr=+at[1];if(at[3]==="pm"&&hr<12)hr+=12;if(at[3]==="am"&&hr===12)hr=0;o.time=hm(hr*60+(+at[2]||0))}
+  const d=D.find(x=>new RegExp("\\b"+x.toLowerCase()).test(s));if(d)o.day=d;return o}
+async function claudeParse(q,key){
+  const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+   body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:200,system:'Convert a student room request into JSON only, no prose. Keys (omit unknown): floor (int, ground=0), ac (bool), duration (minutes int), time ("HH:MM" 24h if stated), day (Mon..Sun if stated).',messages:[{role:"user",content:q}]})});
+  const j=await r.json();return JSON.parse(j.content[0].text.replace(/```json|```/g,"").trim())}
+async function ask(){const q=$("q").value.trim();if(!q)return;let o;const key=$("key").value.trim();
+  try{o=key?await claudeParse(q,key):localParse(q)}catch(e){o=localParse(q)}
+  $("floor").value=o.floor!==undefined?String(o.floor):"";
+  $("dur").value=o.duration||0;
+  if(o.time||o.day){if(o.day)$("day").value=o.day;if(o.time)$("time").value=o.time;onPick()}else render();
+  const c=[];if(o.floor!==undefined)c.push(FN(o.floor));c.push("free for "+($("dur").value)+" min");
+  $("interp").innerHTML="Understood: "+c.map(x=>`<span>${x}</span>`).join("");
+  const n=sortR.filter(r=>matches(r)&&eff(r,view().day,view().t,view().dur).free).length;
+  $("interp").innerHTML+=`<span>${n} rooms match</span>`;}
+
+document.addEventListener("click",e=>{
+  const fp=e.target.closest("[data-f]");if(fp){$("floor").value=fp.dataset.f;render();return}
+  const m=e.target.closest("[data-m]");if(m){sel=m.dataset.m;render();return}
+  const b=e.target.closest("button[data-r]");if(!b)return;const r=b.dataset.r,v=b.dataset.v;
+  if(v==="sq")squad(r)});
+$("go").onclick=ask;$("q").addEventListener("keydown",e=>{if(e.key==="Enter")ask()});
+$("now").onclick=setLive;
+["day","time"].forEach(i=>$(i).addEventListener("change",onPick));
+["dur","floor"].forEach(i=>$(i).addEventListener("input",render));
+$("rot").oninput=e=>$("scene").style.setProperty("--rz",e.target.value+"deg");
+$("tl").onclick=()=>{$("listv").classList.remove("hide");$("mapv").classList.add("hide");$("tl").setAttribute("aria-pressed",true);$("tm").setAttribute("aria-pressed",false)};
+$("tm").onclick=()=>{$("mapv").classList.remove("hide");$("listv").classList.add("hide");$("tm").setAttribute("aria-pressed",true);$("tl").setAttribute("aria-pressed",false);fit()};
+let Z=1,PX=0,PY=0,drag=null;
+function view3d(){const c=$("scene").style;c.setProperty("--z",Z);c.setProperty("--px",PX+"px");c.setProperty("--py",PY+"px")}
+function zoomBy(f){Z=Math.min(3,Math.max(.4,Z*f));view3d()}
+function fit(){Z=Math.min(1,($("stage").clientWidth||820)/820);PX=PY=0;view3d()}
+$("zin").onclick=()=>zoomBy(1.25);$("zout").onclick=()=>zoomBy(.8);$("zfit").onclick=fit;
+$("stage").addEventListener("wheel",e=>{e.preventDefault();zoomBy(e.deltaY<0?1.1:.9)},{passive:false});
+$("stage").addEventListener("pointerdown",e=>{if(e.target.closest(".t,.zoom"))return;drag={x:e.clientX-PX,y:e.clientY-PY}});
+addEventListener("pointermove",e=>{if(drag){PX=e.clientX-drag.x;PY=e.clientY-drag.y;view3d()}});
+addEventListener("pointerup",()=>{drag=null});
+$("day").innerHTML=D.map(d=>`<option>${d}</option>`).join("");
+$("floor").innerHTML='<option value="">All</option>'+[...new Set(Object.values(rooms).map(x=>x.floor))].sort((a,b)=>a-b).map(f=>`<option value="${f}">${FN(f)}</option>`).join("");
+setLive();tick();setInterval(tick,1000);setInterval(()=>{if(!sim){const v=vnow();$("time").value=hm(v.sec/60)}if(!document.activeElement||!/INPUT|SELECT/.test(document.activeElement.tagName))render()},20000);
+</script>
+</body>
+</html>
