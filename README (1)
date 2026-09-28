@@ -1,0 +1,95 @@
+# RoomPulse: Campus Free-Room Finder
+
+A single-file web app that tells students which classrooms are free right now, which period is running, and how long until the next class starts. It was built for the Vibecraft hackathon (Round 2, Phase 1 and Phase 2) using the 10 class timetables provided.
+
+Everything lives in one file: `campus-room-finder.html`. There is no build step and no backend.
+
+## What it does
+
+### Phase 1: Smart-Search Floor Manager
+- **Floor grid:** Rooms are grouped floor by floor (1st to 7th floor, plus the TB block). Each room card shows Free or Busy, the period and section using it, and when the status changes.
+- **AI room finder:** A text bar accepts sentences such as "Free room on the 4th floor for 90 minutes at 3pm". The sentence is turned into filters (floor, duration, time, day), and the matching rooms are shown.
+  - By default a built-in parser reads the sentence, so it works offline.
+  - Optionally, an Anthropic API key can be pasted into the "Use Claude for smarter search" field. Claude then converts the sentence into filters, and the app falls back to the built-in parser if that call fails.
+- **Filters:** Day, time, "free for at least N minutes", and floor pills. "Use live time" returns to the real clock.
+
+### Phase 2: 3D Map, Countdown and Squad Share
+- **3D map:** The IST block is drawn as stacked floors, and the TB block is drawn beside it. Tiles are coloured by availability:
+  - green: free
+  - amber: free, but a class starts within 30 minutes
+  - coral: in use
+- **Countdown timer:** Clicking a room opens a panel with a live countdown to when its next class starts (if free) or when the current class ends (if busy).
+- **Call the squad:** For a free room, a button opens a pre-filled WhatsApp message, for example: "📍 Heading to IST 509. It's free until 2:30 PM. Come fast!"
+- **Zoom and pan:** + / − / Fit buttons, mouse-wheel zoom, drag to move, and a Rotate slider.
+
+## Data
+
+All rooms and classes come from the 10 provided PDF timetables. Only rooms that appear in those PDFs are shown (23 rooms).
+
+| Section | Home venue |
+|---|---|
+| IV ECE-A | IST 225 |
+| III ECE-DS | IST 519 (forenoon) |
+| III ECE-A | IST 518 (forenoon) |
+| III ECE-B | IST 518 (afternoon) |
+| III BME | IST 211 (afternoon) |
+| II ECE-DS A | IST 416 (forenoon) |
+| II ECE-DS B | IST 411 (afternoon) |
+| II BME | IST 602 (forenoon) |
+| I ECE-A, I ECE-B & EEE, I ECE-DS, I Biotech-B | first-year sheets, rooms as printed in each cell |
+
+Rooms in the data: 107, 108, 201, 211, 225, 309, 401, 411, 416, 502, 510, 518, 519, 520, 602, 609, 617, 618, 625, 626, 702, 710 and TB 106.
+
+### How the PDFs were turned into data
+Each timetable is stored as short text lines inside the `RAW` constant in the script:
+
+````
+III ECE-A|0|518          Section | timing table (0 = 2026-27 sheets, 1 = first-year sheets) | home venue
+M 1-4v 6-7@625           Monday: periods 1-4 in the home venue (v), periods 6-7 in room 625
+W 1-4v 8-9@108/309       Wednesday: periods 1-4 in the home venue, periods 8-9 in labs 108 and 309
+````
+
+- A period marked `v` occupies the section's home venue.
+- A period marked `@room` occupies that other room (labs, G-625, TB-106 and so on).
+- Blank cells in a timetable mean nothing is booked, so the room counts as free.
+- Two different period timings are used. The 2026-27 sheets run 09:00 to 16:50 with tea breaks and lunch at period 5. The first-year sheets are labelled 2024-25 and use their own printed times.
+
+To update the data, edit the `RAW` block and reload the page.
+
+## How free or busy is decided
+For a chosen day and time (live by default), a room is:
+1. **Busy** if a class block covers that time.
+2. **Not available** if a class starts before the requested free duration is over ("Free now, but ... starts 3:10 PM").
+3. **Free** otherwise, with the time of its next class if there is one.
+
+A free room is not a reservation. Nothing prevents someone else from using it.
+
+## Running it
+No install is needed.
+
+1. Open `campus-room-finder.html` in any modern browser.
+2. To get a live link for submission, upload the single file to Netlify Drop (app.netlify.com/drop), Vercel or GitHub Pages.
+
+The Outfit font loads from Google Fonts, so a system font is used offline.
+
+## Tech
+- Plain HTML, CSS and JavaScript, with no frameworks or libraries
+- The 3D map uses CSS 3D transforms
+- Optional Claude API call (`claude-haiku-4-5-20251001`) for the natural-language search
+
+## Known limits and assumptions
+- **AC information:** The PDFs do not say which rooms are AC, so the app has no AC filter.
+- **Unnamed rooms:** Cells without a room number, such as "Che lab", "Workshop (IST 20,21)" and unnumbered PPS lab cells, are left out.
+- **First-year sheets:** They are marked 2024-25, and some of their wide cells (for example the German blocks) were hard to read, so those rooms are a best guess.
+- **Room overlap:** The first-year and later-year sheets sometimes use the same room, such as IST 602.
+- **API key:** The API key box is for demos only. In a public deployment, route the Claude call through a small backend so the key is not exposed in the browser.
+- **Weekends:** The timetables cover Monday to Friday, so on weekends and outside 09:00 to 17:00 every room shows as free.
+
+## Possible next steps
+- Share Free/Busy reports between students with a database (this version has no marking feature).
+- Add room capacity and AC data once available.
+- Add sections for the remaining years and departments.
+````
+````
+
+The outer fence uses four backticks because the README contains its own code block. When you copy, take everything between the first and last fence lines.
